@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Razvan Secara, Sabina Pop"]
-  s.date = "2012-03-05"
+  s.date = "2012-03-07"
   s.description = "Detects and masks banned words within a text"
   s.email = ""
   s.extra_rdoc_files = ["CHANGELOG", "README.rdoc", "lib/banned_words.rb", "lib/banned_words/core.rb", "lib/banned_words/storage.rb", "lib/rails/generators/banned_words_generator.rb", "lib/rails/generators/templates/banned_words.yml"]
-  s.files = ["CHANGELOG", "README.rdoc", "Rakefile", "banned_words.gemspec", "lib/banned_words.rb", "lib/banned_words/core.rb", "lib/banned_words/storage.rb", "lib/rails/generators/banned_words_generator.rb", "lib/rails/generators/templates/banned_words.yml", "spec/banned_words_spec.rb", "spec/config/banned_words.yml", "spec/spec_helper.rb", "Manifest"]
+  s.files = ["CHANGELOG", "README.rdoc", "Rakefile", "banned_words.gemspec", "lib/banned_words.rb", "lib/banned_words/core.rb", "lib/banned_words/storage.rb", "lib/rails/generators/banned_words_generator.rb", "lib/rails/generators/templates/banned_words.yml", "spec/banned_words_spec.rb", "spec/lib/core_spec.rb", "spec/lib/storage_spec.yml", "spec/spec_helper.rb", "spec/yamls/banned_words.yml", "Manifest"]
   s.homepage = "https://github.com/razvan-sv/banned_words"
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Banned_words", "--main", "README.rdoc"]
   s.require_paths = ["lib"]

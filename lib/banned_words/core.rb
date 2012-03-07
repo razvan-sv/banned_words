@@ -10,9 +10,9 @@ module Core
     word = word.downcase.strip
     
     if regexed_word = word_to_regex(word)
-      bw_file       = YAML.load_file(Storage::file_path) || {}      
+      bw_file       = YAML.load_file(Storage::FileStore.file_path) || {}      
       bw_file[word] = regexed_word
-      File.open(Storage::file_path, 'w+') { |f| YAML.dump(bw_file, f) }     
+      File.open(Storage::FileStore.file_path, 'w+') { |f| YAML.dump(bw_file, f) }     
     end
 
     regexed_word
@@ -22,7 +22,7 @@ module Core
     # Don't bother verifying if the text isn't present
     return nil unless text.present?
 
-    if banned_words = YAML.load_file(Storage::file_path)
+    if banned_words = YAML.load_file(Storage::FileStore.file_path)
       bw = banned_words.values.join("|")
       text.gsub!(/#{bw}/i, replace_with)      
     end
@@ -36,8 +36,8 @@ module Core
   end
 
   def clear
-    if File.exists?(Storage::file_path)
-      File.open(Storage::file_path, "w+") { |f| YAML.dump(nil, f) }
+    if File.exists?(Storage::FileStore.file_path)
+      File.open(Storage::FileStore.file_path, "w+") { |f| YAML.dump(nil, f) }
     end
 
     true
@@ -48,8 +48,8 @@ module Core
 private
 
   def ensure_yaml_file!   
-    unless File.exists?(Storage::file_path)
-      File.open(Storage::file_path, "w+") { |f| YAML.dump(nil, f) }
+    unless File.exists?(Storage::FileStore.file_path)
+      File.open(Storage::FileStore.file_path, "w+") { |f| YAML.dump(nil, f) }
     end
   end
 
@@ -57,7 +57,7 @@ private
     # Don't bother processing if the word isn't present
     return nil if word.blank? || word[" "]
     
-      regexed_word = ""
+    regexed_word = ""
     word.chars.each_with_index do |char, i|
       regexed_word += char
       # Don't attach the regex after the last char.

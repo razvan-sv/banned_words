@@ -1,5 +1,4 @@
 require "spec_helper"
 
-describe BannedWords do
-	
+describe BannedWords do  
 end
