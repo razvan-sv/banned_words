@@ -1,4 +1,3 @@
-require "yaml"
 require "banned_words"
 
 RSpec.configure do |config|
