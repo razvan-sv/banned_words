@@ -1,8 +1,6 @@
 require "banned_words/storage"
 
 module Core
-  NotImplementedError = Class.new(NotImplementedError)
-  NoBannedWordsFile   = Class.new(IOError)
   
   REGEX = "[^a-zA-Z0-9]*"
 
@@ -36,7 +34,7 @@ module Core
     if File.exists?(Storage::FileStore.file_path)
       YAML.load_file(Storage::FileStore.file_path) || {}
     else
-      # raise
+      raise IOError, "No banned words file!"
     end
   end
 
@@ -44,7 +42,7 @@ module Core
     if File.exists?(Storage::FileStore.file_path)
       File.open(Storage::FileStore.file_path, "w+") { |f| YAML.dump(nil, f) }
     else
-      #raise NoBannedWordsFile
+      raise IOError, "No banned words file!"
     end
   end
 
@@ -58,6 +56,7 @@ module Core
 
   def word_to_regex(word)
     # Don't bother processing if the word isn't present
+    # or has more than one word
     return nil if word.blank? || word[" "]
 
     regexed_word = ""

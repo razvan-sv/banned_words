@@ -71,26 +71,37 @@ describe Core do
     end
 
     it "raises an error if the banned words file isn't found" do
+      remove_storage_file!
+      expect { BannedWords.list }.to raise_error(IOError, "No banned words file!")      
     end
   end
 
   context ".clear" do
     it "clears the banned words list" do
-      
+      BannedWords.create!("wolf")
+      BannedWords.list.size.should == 1
+      BannedWords.clear
+      BannedWords.list.size.should == 0
     end
     
     it "raises NoBannedWordsFile" do
-      FileUtils.rm("#{File.dirname(__FILE__)}/../yamls/banned_words.yml")
-      #lambda { BannedWords.clear }.should raise_error 1 #Core::NoBannedWordsFile
+      remove_storage_file!
+      expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")      
     end
   end
   
   context ".ensure_yaml_file!" do
     it "creates a banned_words.yml file" do
+      remove_storage_file!
       File.exists?(Storage::FileStore.file_path).should == false
       BannedWords.send(:ensure_yaml_file!)
       File.exists?(Storage::FileStore.file_path).should == true
     end
   end
 
+  private
+
+  def remove_storage_file!
+    FileUtils.rm("#{File.dirname(__FILE__)}/../yamls/banned_words.yml")
+  end
 end
