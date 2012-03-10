@@ -1,10 +1,25 @@
 require "spec_helper"
 
 describe Core do
-  let(:banned_words) {["quick", "jumps", "dog"]}
+  let(:banned_words) { ["quick", "jumps", "dog"] }
 
   context ".create!" do
-    it "" do
+    context "with success" do
+      it "adds a banned word to the yaml file" do
+        BannedWords.list.size.should == 0
+        BannedWords.create!("punk")
+        list = BannedWords.list
+        list.size.should    == 1
+        list["punk"].should == "p[^a-zA-Z0-9]*u[^a-zA-Z0-9]*n[^a-zA-Z0-9]*k"
+      end
+    end
+
+    context "with errors" do
+      it "fails to add a banned word containing more than two words" do
+        BannedWords.list.size.should == 0
+        BannedWords.create!("jack black")
+        BannedWords.list.size.should == 0
+      end
     end
   end
 
@@ -44,8 +59,18 @@ describe Core do
   end
 
   context ".list" do
-    it "shows a list of all banned words" do
-      #BannedWords.list
+    it "no banned words in list" do
+      BannedWords.list.size.should == 0
+    end
+
+    it "displays 2 banned words" do
+      ["jack", "black"].map {|word| BannedWords.create!(word)}
+      list = BannedWords.list
+      list.size.should == 2
+      list.keys.should == ["jack", "black"]
+    end
+
+    it "raises an error if the banned words file isn't found" do
     end
   end
 
@@ -56,7 +81,7 @@ describe Core do
     
     it "raises NoBannedWordsFile" do
       FileUtils.rm("#{File.dirname(__FILE__)}/../yamls/banned_words.yml")
-      #lambda { BannedWords.clear }.should raise_error Core::NoBannedWordsFile
+      #lambda { BannedWords.clear }.should raise_error 1 #Core::NoBannedWordsFile
     end
   end
   
