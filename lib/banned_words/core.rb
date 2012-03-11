@@ -10,9 +10,9 @@ module Core
     word = word.downcase.strip
 
     if regexed_word = word_to_regex(word)
-      bw_file       = YAML.load_file(Storage::FileStore.file_path) || {}
+      bw_file       = Storage::FileStore.load_storage
       bw_file[word] = regexed_word
-      File.open(Storage::FileStore.file_path, 'w+') { |f| YAML.dump(bw_file, f) }
+      Storage::FileStore.write_to_storage(bw_file)
     end
 
     regexed_word
@@ -31,26 +31,18 @@ module Core
   end
 
   def list
-    if File.exists?(Storage::FileStore.file_path)
-      YAML.load_file(Storage::FileStore.file_path) || {}
-    else
-      raise IOError, "No banned words file!"
-    end
+    Storage::FileStore.list_contents!
   end
 
   def clear
-    if File.exists?(Storage::FileStore.file_path)
-      File.open(Storage::FileStore.file_path, "w+") { |f| YAML.dump(nil, f) }
-    else
-      raise IOError, "No banned words file!"
-    end
+    Storage::FileStore.clear_storage!
   end
 
   private
 
   def ensure_yaml_file!
-    unless File.exists?(Storage::FileStore.file_path)
-      File.open(Storage::FileStore.file_path, "w+") { |f| YAML.dump(nil, f) }
+    unless Storage::FileStore.storage_exists?
+      Storage::FileStore.empty_storage
     end
   end
 
