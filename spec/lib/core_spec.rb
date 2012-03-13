@@ -5,7 +5,7 @@ describe Core do
 
   context ".create!" do
     context "with success" do
-      it "adds a banned word to the yaml file" do
+      it "adds a banned word to the storage file" do
         BannedWords.list.size.should == 0
         BannedWords.create!("punk")
         list = BannedWords.list
@@ -71,8 +71,8 @@ describe Core do
     end
 
     it "raises an error if the banned words file isn't found" do
-      remove_storage_file!
-      expect { BannedWords.list }.to raise_error(IOError, "No banned words file!")      
+      Storage::FileStore.remove_storage_file
+      expect { BannedWords.list }.to raise_error(IOError, "No banned words file!")
     end
   end
 
@@ -83,25 +83,20 @@ describe Core do
       BannedWords.clear
       BannedWords.list.size.should == 0
     end
-    
+
     it "raises NoBannedWordsFile" do
-      remove_storage_file!
-      expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")      
-    end
-  end
-  
-  context ".ensure_yaml_file!" do
-    it "creates a banned_words.yml file" do
-      remove_storage_file!
-      File.exists?(Storage::FileStore.file_path).should == false
-      BannedWords.send(:ensure_yaml_file!)
-      File.exists?(Storage::FileStore.file_path).should == true
+      Storage::FileStore.remove_storage_file
+      expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")
     end
   end
 
-  private
+  # context ".ensure_yaml_file!" do
+    # it "creates a banned_words.yml file" do
+      # Storage::FileStore.remove_storage_file
+      # File.exists?(Storage::FileStore.file_path).should == false
+      # Storage::FileStore.ensure_storage_file
+      # File.exists?(Storage::FileStore.file_path).should == true
+    # end
+  # end
 
-  def remove_storage_file!
-    FileUtils.rm("#{File.dirname(__FILE__)}/../yamls/banned_words.yml")
-  end
 end

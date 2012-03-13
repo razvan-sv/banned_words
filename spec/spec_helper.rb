@@ -10,6 +10,6 @@ def stub_file_path
 end
 
 def clear_banned_words_file
-  BannedWords.send(:ensure_yaml_file!)
+  Storage::FileStore.ensure_storage_file
   BannedWords.clear
 end
