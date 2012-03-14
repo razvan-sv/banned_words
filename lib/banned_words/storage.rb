@@ -72,6 +72,9 @@ module Storage
       end
     end
     
+    #
+    # Creates the storage file if it's not present
+    #
     def ensure_storage_file
       new_storage if !storage_exists?
     end
