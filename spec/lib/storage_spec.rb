@@ -63,17 +63,21 @@ describe Storage::FileStore do
   end
 
   context "aliases" do
-    it "new_storage behaves like empty_storage with default parameter" do
-      ["new_storage", "empty_storage"].each do |method|
-        add_and_check("cat")
-        Storage::FileStore.send(method)
-        Storage::FileStore.list_contents.should == {}
+    context ".new_storage" do
+      it "behaves like .empty_storage with default parameter" do
+        ["new_storage", "empty_storage"].each do |method|
+          add_and_check("cat")
+          Storage::FileStore.send(method)
+          Storage::FileStore.list_contents.should == {}
+        end
       end
     end
-    
-    it "load_storage behaves like list_contents" do
-      Storage::FileStore.write_to_storage("mouse")
-      Storage::FileStore.load_storage.should == Storage::FileStore.list_contents
+
+    context ".load_storage" do
+      it "behaves like .list_contents" do
+        Storage::FileStore.write_to_storage("mouse")
+        Storage::FileStore.load_storage.should == Storage::FileStore.list_contents
+      end
     end
   end
 
