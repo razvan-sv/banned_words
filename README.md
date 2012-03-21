@@ -3,7 +3,8 @@
 ## Installation
 
 Add this line in your Gemfile:
-  `gem "banned_words"`
+
+`gem "banned_words"`
 
 ## Usage
 
