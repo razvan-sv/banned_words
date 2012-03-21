@@ -8,6 +8,12 @@ Add this line in your Gemfile:
 ```ruby
 gem 'banned_words'
 ```
+Then you need to run:
+
+```ruby
+rails g banned_words
+```
+to generate the banned_words.yml file.
 
 ## Usage
 
