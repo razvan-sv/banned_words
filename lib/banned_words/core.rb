@@ -10,22 +10,28 @@ module Core
   #
   # ==== Parameters
   #
-  # word<String>::
-  #    Contains no more than a word.
-  #    Returns nil if the word failed to be converted into a banned word.
+  # words<String> or <Array>::
+  #    Contains no more than a word or an array of words
+  #    Returns an if the word failed to be converted into a banned word.
   #
-  def create!(word)
+  def create!(words)
 
     Storage::FileStore.ensure_storage_file
-    word = word.downcase.strip
+    words = [words] unless words.is_a? Array
+    regexed_words = []
 
-    if regexed_word = word_to_regex(word)
+    if words.present?
       bw_file       = Storage::FileStore.load_storage
-      bw_file[word] = regexed_word
+      words.each do |word|
+        if regexed_word = word_to_regex(word)
+          bw_file[word] = regexed_word
+          regexed_words << regexed_word
+        end
+      end
       Storage::FileStore.write_to_storage(bw_file)
     end
 
-    regexed_word
+    regexed_words
   end
 
   #
@@ -75,6 +81,7 @@ module Core
     return nil if word.blank? || word[" "]
 
     regexed_word = ""
+    word = word.downcase.strip
     word.chars.each_with_index do |char, i|
       regexed_word += char
       # Don't attach the regex after the last char.
