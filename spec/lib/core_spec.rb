@@ -23,7 +23,7 @@ describe Core do
     end
   end
 
-  context ".verify" do
+  context ".mask" do
     before do
       banned_words.each do |word|
         BannedWords.create!(word)
@@ -33,14 +33,14 @@ describe Core do
     context "success" do
       it "detects & masks one banned word - dog" do
         phrase     = "The dog is purple"
-        new_phrase = BannedWords.verify(phrase)
+        new_phrase = BannedWords.mask(phrase)
         new_phrase.should == "The *Buzz* is purple"
         new_phrase.should_not include "dog"
       end
 
       it "detects & masks more banned words - dog, jumps, quick" do
         phrase     = "The quick brown fox jumps over the lazy dog"
-        new_phrase = BannedWords.verify(phrase)
+        new_phrase = BannedWords.mask(phrase)
         new_phrase.should == "The *Buzz* brown fox *Buzz* over the lazy *Buzz*"
         banned_words.each do |bw|
           new_phrase.should_not include bw
@@ -51,7 +51,7 @@ describe Core do
     context "no changes" do
       it "cannot find any banned words" do
         phrase     = "Rock music records"
-        new_phrase = BannedWords.verify(phrase)
+        new_phrase = BannedWords.mask(phrase)
         new_phrase.should == phrase
       end
     end
@@ -89,14 +89,5 @@ describe Core do
       expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")
     end
   end
-
-  # context ".ensure_yaml_file!" do
-    # it "creates a banned_words.yml file" do
-      # Storage::FileStore.remove_storage_file
-      # File.exists?(Storage::FileStore.file_path).should == false
-      # Storage::FileStore.ensure_storage_file
-      # File.exists?(Storage::FileStore.file_path).should == true
-    # end
-  # end
 
 end

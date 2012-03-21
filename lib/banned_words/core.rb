@@ -29,8 +29,7 @@ module Core
   end
 
   #
-  # Verifies if the supplied text contains banned words.
-  # If banned words are found then they're replaced with a user supplied word.
+  # Masks the banned words within supplied text.
   # Returns the changed text. If no banned words are found then the initial text is returned.
   #
   # ==== Parameters
@@ -40,7 +39,7 @@ module Core
   # replace_with<String>::
   #   The word which replaces the banned words. It defaults to *Buzz*.
   #
-  def verify(text, replace_with = "*Buzz*")
+  def mask(text, replace_with = "*Buzz*")
     # Don't bother verifying if the text isn't present
     return nil unless text.present?
 
