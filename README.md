@@ -4,6 +4,7 @@ Detects and masks banned words within a text
 ## Installation
 
 Add this line in your Gemfile:
+
 ```ruby
 gem 'banned_words'
 ```
