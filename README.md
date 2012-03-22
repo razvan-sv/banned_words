@@ -17,14 +17,34 @@ to generate the banned_words.yml file.
 
 ## Usage
 
+### Masking
 ```ruby
 BannedWords.create!('dog')
-phrase = 'The quick brown fox jumps over the lazy dog'
-BannedWords.mask(phrase)
-> 'The quick brown fox jumps over the lazy *Buzz*'
-
-# Another example:
 phrase = 'Red d-o-g'
 BannedWords.mask(phrase)
 > 'Red *Buzz*'
+
+# Another example:
+BannedWords.create!(['fox', 'over'])
+phrase = 'The quick brown fox jumps over the lazy dog'
+BannedWords.mask(phrase)
+> 'The quick brown *Buzz* jumps *Buzz* the lazy *Buzz*'
+```
+
+### Listing
+```ruby
+BannedWords.list
+> ['dog', 'fox', 'over']
+```
+
+### Removing
+```ruby
+BannedWords.remove('dog')
+BannedWords.list
+> ['fox', 'over']
+
+# Another example:
+BannedWords.remove(['fox', 'over'])
+BannedWords.list
+> []
 ```
