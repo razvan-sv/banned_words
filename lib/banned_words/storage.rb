@@ -15,7 +15,7 @@ module Storage
     def storage_exists?
       File.exists?(file_path)
     end
-    
+
     #
     # Write new data to storage. The supplied hash value will overwrite the
     # exising data from the storage.
@@ -30,18 +30,26 @@ module Storage
         YAML.dump(value, file)
       end
     end
-    
+
     #
-    # Returns a hash containing the banned words.
-    # If no banned words are present the returned has is empty.
+    # Returns a hash containing the banned words along with their regexes.
+    # If no banned words are present the returned hash is empty.
     #
-    def list_contents
+    def load_storage
       YAML.load_file(file_path) || {}
     end
-    alias_method :load_storage, :list_contents
-    
+
     #
-    # Returns a hash containing the banned words if the storage file exists.
+    # Returns an array containing the banned words.
+    # If no banned words are present the returned array is empty.
+    #
+    def list_contents
+      list = load_storage
+      list.is_a?(Hash) ? list.keys : [list]
+    end
+
+    #
+    # Returns an array containing the banned words if the storage file exists.
     # Otherwise an error is raised.
     #
     def list_contents!
@@ -51,7 +59,7 @@ module Storage
         raise IOError, "No banned words file!"
       end
     end
-    
+
     #
     # Clear the storage.
     #
@@ -59,7 +67,7 @@ module Storage
       write_to_storage
     end
     alias_method :new_storage, :empty_storage
-    
+
     #
     # Clear storage file if it exists.
     # Otherwise an error is raised.
@@ -71,14 +79,14 @@ module Storage
         raise IOError, "No banned words file!"
       end
     end
-    
+
     #
     # Creates the storage file if it's not present
     #
     def ensure_storage_file
       new_storage if !storage_exists?
     end
-    
+
     #
     # Mostly used in specs
     #

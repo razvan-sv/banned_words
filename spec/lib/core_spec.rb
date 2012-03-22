@@ -5,12 +5,17 @@ describe Core do
 
   context ".create!" do
     context "with success" do
-      it "adds a banned word to the storage file" do
+      it "single banned word" do
         BannedWords.list.size.should == 0
         BannedWords.create!("punk")
-        list = BannedWords.list
+        list = Storage::FileStore.load_storage
         list.size.should    == 1
         list["punk"].should == "p[^a-zA-Z0-9]*u[^a-zA-Z0-9]*n[^a-zA-Z0-9]*k"
+      end
+      it "array of banned words" do
+        BannedWords.list.size.should == 0
+        BannedWords.create!(banned_words)
+        BannedWords.list.size.should == 3
       end
     end
 
@@ -25,9 +30,7 @@ describe Core do
 
   context ".mask" do
     before do
-      banned_words.each do |word|
-        BannedWords.create!(word)
-      end
+      BannedWords.create!(banned_words)
     end
 
     context "success" do
@@ -37,7 +40,6 @@ describe Core do
         new_phrase.should == "The *Buzz* is purple"
         new_phrase.should_not include "dog"
       end
-
       it "detects & masks more banned words - dog, jumps, quick" do
         phrase     = "The quick brown fox jumps over the lazy dog"
         new_phrase = BannedWords.mask(phrase)
@@ -62,14 +64,12 @@ describe Core do
     it "no banned words in list" do
       BannedWords.list.size.should == 0
     end
-
     it "displays 2 banned words" do
       ["jack", "black"].map {|word| BannedWords.create!(word)}
       list = BannedWords.list
       list.size.should == 2
-      list.keys.should == ["jack", "black"]
+      list.should == ["jack", "black"]
     end
-
     it "raises an error if the banned words file isn't found" do
       Storage::FileStore.remove_storage_file
       expect { BannedWords.list }.to raise_error(IOError, "No banned words file!")
@@ -83,11 +83,27 @@ describe Core do
       BannedWords.clear
       BannedWords.list.size.should == 0
     end
-
     it "raises NoBannedWordsFile" do
       Storage::FileStore.remove_storage_file
       expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")
     end
   end
 
+  context ".remove" do
+    before do
+      BannedWords.create!(banned_words)
+    end
+    it "one banned word" do
+      BannedWords.remove("dog")
+      BannedWords.list.should == ["quick", "jumps"]
+    end
+    it "many banned words" do
+      BannedWords.remove(["dog", "quick"])
+      BannedWords.list.should == ["jumps"]
+    end
+    it "banned word not found" do
+      BannedWords.remove(["ringo"])
+      BannedWords.list.should == ["quick", "jumps", "dog"]
+    end
+  end
 end
