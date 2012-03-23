@@ -58,6 +58,10 @@ describe Core do
         new_phrase = BannedWords.mask(phrase, "*Bad Word*")
         new_phrase.should == "The *Bad Word* brown fox *Bad Word* over the lazy *Bad Word*"
       end
+      it "should not mask anything" do
+        BannedWords.remove(banned_words)
+        BannedWords.mask(phrase).should == phrase
+      end
     end
 
     context "no changes" do

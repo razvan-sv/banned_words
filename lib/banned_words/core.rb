@@ -46,7 +46,7 @@ module Core
     # Don't bother verifying if the text isn't present
     return nil unless text.present?
 
-    if banned_words = Storage::FileStore.load_storage
+    if (banned_words = Storage::FileStore.load_storage).present?
       bw = banned_words.values.join("|")
       text.gsub!(/#{bw}/i, replace_with)
     end
