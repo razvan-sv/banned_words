@@ -62,6 +62,6 @@ BannedWords.list
 > []
 ```
 
-#### Copyright
+## Copyright
 
 See LICENSE for details.
