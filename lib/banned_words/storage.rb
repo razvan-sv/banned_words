@@ -45,7 +45,7 @@ module Storage
     #
     def list_contents
       list = load_storage
-      list.is_a?(Hash) ? list.keys : [list]
+      list.is_a?(Hash) ? list.keys.sort : [list]
     end
 
     #

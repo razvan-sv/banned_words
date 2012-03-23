@@ -91,7 +91,7 @@ describe Core do
       BannedWords.create!(["jack", "black"])
       list = BannedWords.list
       list.size.should == 2
-      list.should == ["jack", "black"]
+      list.should == ["black", "jack"]
     end
     it "raises an error if the banned words file isn't found" do
       Storage::FileStore.remove_storage_file
@@ -118,7 +118,7 @@ describe Core do
     end
     it "one banned word" do
       BannedWords.remove("dog")
-      BannedWords.list.should == ["quick", "jumps"]
+      BannedWords.list.should == ["jumps", "quick"]
     end
     it "many banned words" do
       BannedWords.remove(["dog", "quick"])
@@ -126,7 +126,7 @@ describe Core do
     end
     it "banned word not found" do
       BannedWords.remove(["ringo"])
-      BannedWords.list.should == ["quick", "jumps", "dog"]
+      BannedWords.list.should == ["dog", "jumps", "quick"]
     end
   end
 end
