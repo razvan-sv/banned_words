@@ -1,6 +1,8 @@
 # Banned Words
 Detects and masks banned words within a text
 
+[![Build Status](https://secure.travis-ci.org/razvan-sv/banned_words.png?branch=master)](http://travis-ci.org/razvan-sv/banned_words)
+
 ## Installation
 
 Add this line in your Gemfile:
