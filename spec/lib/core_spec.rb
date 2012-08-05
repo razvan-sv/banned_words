@@ -87,27 +87,6 @@ describe Core do
     end
   end
 
-  context ".detect" do
-    before do
-      banned_words.each do |word|
-        BannedWords.create!(word)
-      end
-    end
-    
-    it "detects - dog, jumps, quick" do
-      phrase    = "The quick brown fox jumps over the lazy dog"
-      bad_words = BannedWords.detect(phrase)
-      bad_words.should == ["quick", "jumps", "dog"]
-    end
-    
-    it "no banned words" do
-      phrase    = "How are you?"
-      bad_words = BannedWords.detect(phrase)
-      bad_words.should == []
-    end
-    
-  end
-  
   context ".list" do
     it "no banned words in list" do
       BannedWords.list.size.should == 0
