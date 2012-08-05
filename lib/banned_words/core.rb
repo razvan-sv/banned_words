@@ -56,7 +56,28 @@ module Core
 
     text
   end
-
+  
+  #
+  # Detects the banned words within supplied text.
+  # Returns an array with all the matches. The order of the matches is the same as within the text.
+  # If no banned words are found then an empty array is returned
+  #
+  # ==== Parameters
+  #
+  # text<String>::
+  #   The text which is checked for banned words.
+  #
+  def detect(text)
+    findings = []
+    return findings unless text.present?
+    
+    if banned_words = YAML.load_file(Storage::FileStore.file_path)
+      findings = text.scan(/#{banned_words.values.join("|")}/i)
+    end
+    
+    findings
+  end
+  
   #
   # List the banned words. If the storage file isn't found an error is raised.
   #
