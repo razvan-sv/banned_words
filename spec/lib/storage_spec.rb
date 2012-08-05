@@ -20,7 +20,7 @@ describe Storage::FileStore do
 
   context ".list_contents" do
     it "returns no elements" do
-      Storage::FileStore.list_contents.should == {}
+      Storage::FileStore.list_contents.should == []
     end
     it "returns one element" do
       add_and_check("cat")
@@ -30,7 +30,7 @@ describe Storage::FileStore do
   context ".list_contents!" do
     it "returns one element" do
       Storage::FileStore.write_to_storage("cat")
-      Storage::FileStore.list_contents!.should == "cat"
+      Storage::FileStore.list_contents!.should == ["cat"]
     end
 
     it "raises IOError" do
@@ -44,7 +44,7 @@ describe Storage::FileStore do
     it "cleares all data" do
       add_and_check("cat")
       Storage::FileStore.empty_storage
-      Storage::FileStore.list_contents.should == {}
+      Storage::FileStore.list_contents.should == []
     end
   end
 
@@ -52,7 +52,7 @@ describe Storage::FileStore do
     it "cleares all data" do
       add_and_check("cat")
       Storage::FileStore.empty_storage!
-      Storage::FileStore.list_contents.should == {}
+      Storage::FileStore.list_contents.should == []
     end
 
     it "raises IOError" do
@@ -68,15 +68,8 @@ describe Storage::FileStore do
         ["new_storage", "empty_storage"].each do |method|
           add_and_check("cat")
           Storage::FileStore.send(method)
-          Storage::FileStore.list_contents.should == {}
+          Storage::FileStore.list_contents.should == []
         end
-      end
-    end
-
-    context ".load_storage" do
-      it "behaves like .list_contents" do
-        Storage::FileStore.write_to_storage("mouse")
-        Storage::FileStore.load_storage.should == Storage::FileStore.list_contents
       end
     end
   end
@@ -85,6 +78,6 @@ describe Storage::FileStore do
 
   def add_and_check(word)
     Storage::FileStore.write_to_storage(word)
-    Storage::FileStore.list_contents.should == word
+    Storage::FileStore.list_contents.should == [word]
   end
 end

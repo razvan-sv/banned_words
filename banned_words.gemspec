@@ -3,10 +3,10 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "banned_words"
-  s.version     = "0.1.0"
+  s.version     = "0.1.1"
   s.authors     = ["Razvan Secara", "Pop Sabina"]
   s.email       = ["secara.razvan@yahoo.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/razvan-sv/banned_words"
   s.summary     = %q{Detects and masks banned words within a text}
   s.description = %q{Detects and masks banned words within a text}
 

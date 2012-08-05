@@ -5,33 +5,30 @@ module Core
   BW_REGEX = "[^a-zA-Z0-9]*"
 
   #
-  # Create a banned word. The supplied word is transformed into a banned word
-  # and stored into the storage file. The banned word is returned.
+  # Create banned words. The supplied words are transformed into a banned words
+  # and stored into the storage file. An array of banned words is returned.
   #
   # ==== Parameters
   #
   # words<String> or <Array>::
-  #    Contains no more than a word or an array of words
-  #    Returns an if the word failed to be converted into a banned word.
+  #    Contains a word or an array of words. The words should not contain spaces.
   #
   def create!(words)
 
     Storage::FileStore.ensure_storage_file
-    words = [words] unless words.is_a? Array
-    regexed_words = []
+    words = words_to_array(words)
 
     if words.present?
       bw_file       = Storage::FileStore.load_storage
-      words.each do |word|
+      regexed_words = words.map do |word|
         if regexed_word = word_to_regex(word)
           bw_file[word] = regexed_word
-          regexed_words << regexed_word
         end
       end
       Storage::FileStore.write_to_storage(bw_file)
     end
 
-    regexed_words
+    regexed_words || []
   end
 
   #
@@ -49,7 +46,7 @@ module Core
     # Don't bother verifying if the text isn't present
     return nil unless text.present?
 
-    if banned_words = YAML.load_file(Storage::FileStore.file_path)
+    if (banned_words = Storage::FileStore.load_storage).present?
       bw = banned_words.values.join("|")
       text.gsub!(/#{bw}/i, replace_with)
     end
@@ -86,14 +83,54 @@ module Core
   end
 
   #
-  # Removes all banned words. If the storage file isn't found an error is raised.
+  # Detects the banned words in the supplied text.
+  # It returnes an array containing the found banned words.
+  # An empty array is returned if no banned words are found.
+  #
+  # ==== Parameters
+  #
+  # text<String>::
+  #   The text which is checked for banned words.
+  #
+  def detect(text)
+    # Don't bother verifying if the text isn't present
+    return [] unless text.present?
+
+    if banned_words = Storage::FileStore.load_storage
+      bw = banned_words.values.join("|")
+      return text.scan(/#{bw}/i)
+    end
+
+    []
+  end
+
+  #
+  # Removes all banned words from the storage fild.
+  # If the storage file isn't found an error is raised.
   #
   def clear
     Storage::FileStore.empty_storage!
   end
 
+  #
+  # Removes the supplied banned words from the list.
+  #
+  # ==== Parameters
+  #
+  # words<String> or <Array>::
+  #    Contains a word or an array of words.
+  #
+  def remove(words)
+    words = words_to_array(words)
+
+    if (bw_list = Storage::FileStore.load_storage).present?
+      new_bw = bw_list.reject { |name, regexed_name| words.include?(name) }
+      Storage::FileStore.write_to_storage(new_bw) if new_bw != bw_list
+    end
+  end
+
   private
-  
+
   #
   # Transforms the word into a banned word. The BW_REGEX gets attached between every char.
   #
@@ -110,6 +147,13 @@ module Core
     end
 
     regexed_word
+  end
+
+  #
+  # TODO
+  #
+  def words_to_array(words)
+    words.is_a?(Array) ? words : [words]
   end
 
 end

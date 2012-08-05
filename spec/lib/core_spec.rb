@@ -2,15 +2,27 @@ require "spec_helper"
 
 describe Core do
   let(:banned_words) { ["quick", "jumps", "dog"] }
+  let(:cart_regex)   { "c[^a-zA-Z0-9]*a[^a-zA-Z0-9]*r[^a-zA-Z0-9]*t" }
+  let(:phrase)       { "The q-u#-_^i!c~k brown fox j=u m p?s over the lazy dog" }
 
   context ".create!" do
     context "with success" do
-      it "adds a banned word to the storage file" do
+      it "single banned word" do
         BannedWords.list.size.should == 0
-        BannedWords.create!("punk")
-        list = BannedWords.list
+        BannedWords.create!("cart").should == [cart_regex]
+        list = Storage::FileStore.load_storage
         list.size.should    == 1
-        list["punk"].should == "p[^a-zA-Z0-9]*u[^a-zA-Z0-9]*n[^a-zA-Z0-9]*k"
+        list["cart"].should == cart_regex
+      end
+      it "array of banned words" do
+        BannedWords.list.size.should == 0
+        result = BannedWords.create!(banned_words)
+        result.should == [
+          "q[^a-zA-Z0-9]*u[^a-zA-Z0-9]*i[^a-zA-Z0-9]*c[^a-zA-Z0-9]*k",
+          "j[^a-zA-Z0-9]*u[^a-zA-Z0-9]*m[^a-zA-Z0-9]*p[^a-zA-Z0-9]*s",
+          "d[^a-zA-Z0-9]*o[^a-zA-Z0-9]*g"
+        ]
+        BannedWords.list.size.should == 3
       end
     end
 
@@ -25,9 +37,7 @@ describe Core do
 
   context ".mask" do
     before do
-      banned_words.each do |word|
-        BannedWords.create!(word)
-      end
+      BannedWords.create!(banned_words)
     end
 
     context "success" do
@@ -37,14 +47,20 @@ describe Core do
         new_phrase.should == "The *Buzz* is purple"
         new_phrase.should_not include "dog"
       end
-
       it "detects & masks more banned words - dog, jumps, quick" do
-        phrase     = "The quick brown fox jumps over the lazy dog"
         new_phrase = BannedWords.mask(phrase)
         new_phrase.should == "The *Buzz* brown fox *Buzz* over the lazy *Buzz*"
         banned_words.each do |bw|
           new_phrase.should_not include bw
         end
+      end
+      it "mask with *Bad Word*" do
+        new_phrase = BannedWords.mask(phrase, "*Bad Word*")
+        new_phrase.should == "The *Bad Word* brown fox *Bad Word* over the lazy *Bad Word*"
+      end
+      it "should not mask anything" do
+        BannedWords.remove(banned_words)
+        BannedWords.mask(phrase).should == phrase
       end
     end
 
@@ -55,7 +71,20 @@ describe Core do
         new_phrase.should == phrase
       end
     end
+  end
 
+  context ".detect" do
+    it "returns banned words within a text" do
+      BannedWords.create!(banned_words)
+      BannedWords.detect(phrase).should == ["q-u#-_^i!c~k", "j=u m p?s", "dog"]
+    end
+    it "doesn't find any banned words" do
+      BannedWords.create!(banned_words)
+      BannedWords.detect("How do you do").should == []
+    end
+    it "no text is supplied" do
+      BannedWords.detect("").should == []
+    end
   end
 
   context ".detect" do
@@ -83,14 +112,12 @@ describe Core do
     it "no banned words in list" do
       BannedWords.list.size.should == 0
     end
-
     it "displays 2 banned words" do
-      ["jack", "black"].map {|word| BannedWords.create!(word)}
+      BannedWords.create!(["jack", "black"])
       list = BannedWords.list
       list.size.should == 2
-      list.keys.should == ["jack", "black"]
+      list.should == ["black", "jack"]
     end
-
     it "raises an error if the banned words file isn't found" do
       Storage::FileStore.remove_storage_file
       expect { BannedWords.list }.to raise_error(IOError, "No banned words file!")
@@ -104,11 +131,27 @@ describe Core do
       BannedWords.clear
       BannedWords.list.size.should == 0
     end
-
     it "raises NoBannedWordsFile" do
       Storage::FileStore.remove_storage_file
       expect { BannedWords.clear }.to raise_error(IOError, "No banned words file!")
     end
   end
 
+  context ".remove" do
+    before do
+      BannedWords.create!(banned_words)
+    end
+    it "one banned word" do
+      BannedWords.remove("dog")
+      BannedWords.list.should == ["jumps", "quick"]
+    end
+    it "many banned words" do
+      BannedWords.remove(["dog", "quick"])
+      BannedWords.list.should == ["jumps"]
+    end
+    it "banned word not found" do
+      BannedWords.remove(["ringo"])
+      BannedWords.list.should == ["dog", "jumps", "quick"]
+    end
+  end
 end
